@@ -1,0 +1,56 @@
+第3章 Lambda表达式
+
+    3.2 在哪里可以使用Lambda表达式
+        3.2.1 函数式接口
+            函数式接口是只定义一个抽象方法的接口
+
+        3.2.2 函数描述符
+            函数式接口的抽象方法的签名基本上就是Lambda表达式的签名, 这种抽象方法叫作函数描述符.
+
+    3.3 Lambda表达式付诸实践
+        环绕执行模式
+
+    3.4 使用函数式接口
+        3.4.1 Predicate
+            java.util.function.Predicate<T> 接口定义了一个名叫test的抽象方法
+            接受泛型T对象, 返回一个boolean.
+
+        3.4.2 Consumer
+            java.util.function.Consumer<T> 接口定义了一个名叫accept的抽象方法.
+            接受泛型T对象, 没有返回值.
+
+        3.4.3 Function
+            java.util.function.Function<T, R> 接口定义了apply方法, 接受泛型T对象, 返回泛型R对象.
+
+            原始类型特化
+
+        3.5 类型检查、类型推断以及限制
+            3.5.1 类型检查
+                Lambda表达式需要的类型成为目标类型。
+            3.5.2 同样的Lambda，不同的函数式接口
+                有了目标类型的概念，同一个lambda表达式就可以与不同的函数式接口联系起来，只要抽象方法签名可以兼容。
+                特殊的void兼容规则：
+                    如果一个Lambda表达式的主体是一个语句表达式，它就和y一个返回void的函数描述符兼容。
+            3.5.3 类型推断
+                Comparator<Apple> c = (Apple a1, Apple a2) -> a1.getWeight().compareTo(a2.getWeight());
+                Comparator<Apple> c = (a1, a2) -> a1.getWeight().compareTo(a2.getWeight());有类型推断
+
+            3.5.4 使用局部变量
+                Lambda表达式可以没有限制的捕获实例变量和静态变量。但局部变量必须是final或者是事实上的final。
+                局部变量若不是final的则只能赋值一次。
+
+        3.6 方法引用
+                方法引用主要有三类：
+                1. 指向静态方法的引用（Integer的parseInt方法 Integer::parseInt）
+                2. 指向任意类型实例方法（String的length方法 String::length）
+                3. 指向现有对象的实例方法（expensiveTransaction用于存放Transaction对象 expensiveTransaction::getValue）
+
+            3.6.2 构造函数引用
+                Supplier<Apple> c1 = Apple::new;
+                Apple a1 = c1.get();
+
+                Function<Integer, Apple> c2 = Apple::new;
+                Apple a2 = c2.apply(110);
+
+                BiFunction<String, Integer, Apple> c3 = Apple::new;
+                Apple c3 = c3.apply("green", 110);

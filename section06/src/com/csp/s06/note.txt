@@ -1,0 +1,54 @@
+第6章 用流收集数据
+
+    6.2 归约和汇总
+        6.2.1 查找流中的最大值和最小值
+            Comparator<Dish> dishCaloriesComparator = Comparator.comparingInt(Dish::getCalories);
+            Optional<Dish> mostCalorieDish = menu.stream().collect(maxBy(dishCaloriesComparator));
+
+        6.2.2 汇总
+            int totalCalories = menu.stream().collect(summingInt(Dish::getCalories));
+            double avgCalories = menu.stream().collect(Collectors.averagingInt(Dish::getCalories));
+            IntSummaryStatistics menuStatistics = menu.stream().collect(summarizingInt(Dish::getCalories));
+
+        6.2.3 连接字符串
+            String shortMenu = menu.stream().map(Dish::getName).collect(joining(", "));
+
+        6.2.4 广义的归约汇总
+            int totalCalories = menu.stream().collect(reducing(0, Dish::getCalories, (i, j) -> i + j));
+            第一个参数是归约操作的起始值，也是流中没有元素时的返回值，所以很显然对于数值和而言 0 是一个合适的值。
+            第二个参数就是你在6.2.2节中使用的函数，将菜肴转换成一个表示其所含热量的 int 。
+            第三个参数是一个 BinaryOperator ，将两个项目累积成一个同类型的值。这里它就是对两个 int 求和。
+
+    6.3 分组
+        Map<Dish.Type, List<Dish>> dishesByType = menu.stream().collect(groupingBy(Dish::getType));
+
+        6.3.1 多级分组
+            Map<Dish.Type, Map<CaloricLevel, List<Dish>>> dishesByTypeCaloricLevel =
+            menu.stream().collect(
+                groupingBy(Dish::getType,
+                    groupingBy(dish -> {
+                        if (dish.getCalories() <= 400) return CaloricLevel.DIET;
+                        else if (dish.getCalories() <= 700) return CaloricLevel.NORMAL;
+                        else return CaloricLevel.FAT;
+                    } )
+                )
+            );
+
+        6.3.2 按子组收集数据
+            Map<Dish.Type, Long> typesCount = menu.stream().collect(
+                                groupingBy(Dish::getType, counting()));
+
+    6.4 分区
+        分区是分组的特殊情况：由一个谓词（返回一个布尔值的函数）作为分类函数，它称分区函数。
+        Map<Boolean, List<Dish>> partitionedMenu =
+        menu.stream().collect(partitioningBy(Dish::isVegetarian));
+
+        这会返回下面的 Map ：
+        {false=[pork, beef, chicken, prawns, salmon],
+        true=[french fries, rice, season fruit, pizza]}
+
+        6.4.1 分区的优势
+            分区的好处在于保留了分区函数返回 true 或 false 的两套流元素列表
+        6.4.2 将数字按质数和非质数分区
+
+    6.5 收集器接口
